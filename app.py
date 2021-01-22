@@ -1,0 +1,48 @@
+from flask import Flask
+from flask import request
+import json
+from flask_cors import cross_origin
+import requests
+
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def hello_world():
+    return 'Hello World!'
+
+@app.route("/api/v1/ttjjHistoryList")
+@cross_origin(origins="*")
+def ttjjHistoryList():
+
+    code = request.args.get("code")
+    pageSize = request.args.get("pageSize")
+    print(code)
+    print(pageSize)
+
+    header = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+
+    data = {
+        "product": "EFund",
+        "FCODE": code,
+        "pageSize": pageSize,
+        "deviceid": "1",
+        "version": "6.3.5",
+        "MobileKey": "1",
+        "pageIndex": "1",
+        "appType": "ttjj",
+        "plat": "Android"
+    }
+
+    res = requests.post("https://fundmobapi.eastmoney.com/FundMNewApi/FundMNHisNetList", headers=header, data=data)
+
+
+
+    return {"result":json.loads(res.text)}
+
+
+if __name__ == '__main__':
+    app.run()

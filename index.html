@@ -11,7 +11,8 @@
 
 		<div id="app">
 			<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-			<div id="main" style="width: 600px;height:400px;"></div>
+			<div id="chart1" style="width: 600px;height:400px;"></div>
+			<div id="chart2" style="width: 600px;height:400px;"></div>
 			<!-- <input type="text"  v-model="code" name="" id="" value="" />
 			<button @click="request">刷新</button> -->
 			<select @change="selectChange" v-model="code">
@@ -37,10 +38,10 @@
 								"name": "白酒"
 							},
 							{
-									"code": "167301",
-									"name": "保险"
-								},
-							
+								"code": "167301",
+								"name": "保险"
+							},
+
 							{
 								"code": "001595",
 								"name": "银行"
@@ -48,6 +49,14 @@
 							{
 								"code": "501090",
 								"name": "消费"
+							},
+							{
+								"code": "320007",
+								"name": "诺安"
+							},
+							{
+								"code": "161726",
+								"name": "生物"
 							}
 						]
 					}
@@ -55,10 +64,10 @@
 				methods: {
 					request() {
 						var self = this;
-						axios.get("http://localhost:8080/api/v1/ttjjHistoryList" + "?code=" + this.code + "&pageSize=" + this.pageSize)
+						axios.get("http://127.0.0.1:5000/api/v1/ttjjHistoryList" + "?code=" + this.code + "&pageSize=" + this.pageSize)
 							.then(function(response, error) {
 								console.log("请求成功!");
-								// console.log(response.data);
+								console.log(response.data);
 								self.list = response.data.result.Datas;
 
 								// 清空数组
@@ -89,15 +98,33 @@
 							})
 					},
 					drawLine() {
-						console.log("123");
-						var myChart = echarts.init(document.getElementById('main'));
 
-						console.log(myChart);
+						var chart1 = echarts.init(document.getElementById('chart1'));
+						var chart2 = echarts.init(document.getElementById('chart2'));
 
-
-						var option = {
+						var option1 = {
 							title: {
-								text: '测试'
+								text: ''
+							},
+							tooltip: {},
+							legend: {
+								data: ['动能']
+							},
+							xAxis: {
+								data: this.x
+							},
+							yAxis: {},
+							series: [{
+									name: '涨跌动能',
+									type: 'line',
+									data: this.y
+								},
+							]
+						};
+
+						var option2 = {
+							title: {
+								text: ''
 							},
 							tooltip: {},
 							legend: {
@@ -109,17 +136,14 @@
 							yAxis: {},
 							series: [{
 								name: '涨跌动能',
-								type: 'line',
+								type: 'bar',
 								data: this.y
-							},
-							{
-								name: '净值',
-								type: 'line',
-								data: this.y2
 							}]
 						};
 
-						myChart.setOption(option);
+
+						chart1.setOption(option1);
+						chart2.setOption(option2);
 
 					},
 					selectChange() {
