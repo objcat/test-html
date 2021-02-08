@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.12/vue.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.0.1/echarts.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+
+		<div id="app">
+			<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+			<div id="chart1" style="width: 600px;height:400px;"></div>
+			<div id="chart2" style="width: 600px;height:400px;"></div>
+			<!-- <input type="text"  v-model="code" name="" id="" value="" />
+			<button @click="request">刷新</button> -->
+			<select @change="selectChange" v-model="code">
+				<option v-for="item in jjList" :value="item.code">{{ item.name }}</option>
+			</select>
+		</div>
+
+
+
+		<script type="text/javascript">
+			new Vue({
+				el: "#app",
+				data() {
+					return {
+						list: [],
+						x: [],
+						y: [],
+						y2: [],
+						code: "",
+						pageSize: 40,
+						jjList: [{
+								"code": "161725",
+								"name": "白酒"
+							},
+							{
+								"code": "167301",
+								"name": "保险"
+							},
+
+							{
+								"code": "001595",
+								"name": "银行"
+							},
+							{
+								"code": "501090",
+								"name": "消费"
+							},
+							{
+								"code": "320007",
+								"name": "诺安"
+							},
+							{
+								"code": "161726",
+								"name": "生物"
+							}
+						]
+					}
+				},
+				methods: {
+					request() {
+						var self = this;
+						axios.get("http://127.0.0.1:5000/api/v1/ttjjHistoryList" + "?code=" + this.code + "&pageSize=" + this.pageSize)
+							.then(function(response, error) {
+								console.log("请求成功!");
+								console.log(response.data);
+								self.list = response.data.result.Datas;
+
+								// 清空数组
+								self.x = []
+								self.y = []
+								self.y2 = []
+
+								// 赋值
+								for (var key in self.list) {
+									// console.log(item);
+									self.x.push(self.list[key]["FSRQ"].substr(5, 5));
+									self.y.push(self.list[key]["JZZZL"]);
+									// self.y2.push(self.list[key]["LJJZ"]);
+								}
+
+								self.x = self.x.reverse();
+								self.y = self.y.reverse();
+
+								console.log(self.x);
+								console.log(self.y);
+								self.drawLine();
+
+
+							}).catch(function(error) {
+								if (error != null) {
+									console.log("出错啦");
+								}
+							})
+					},
+					drawLine() {
+
+						var chart1 = echarts.init(document.getElementById('chart1'));
+						var chart2 = echarts.init(document.getElementById('chart2'));
+
+						var option1 = {
+							title: {
+								text: ''
+							},
+							tooltip: {},
+							legend: {
+								data: ['动能']
+							},
+							xAxis: {
+								data: this.x
+							},
+							yAxis: {},
+							series: [{
+									name: '涨跌动能',
+									type: 'line',
+									data: this.y
+								},
+							]
+						};
+
+						var option2 = {
+							title: {
+								text: ''
+							},
+							tooltip: {},
+							legend: {
+								data: ['动能']
+							},
+							xAxis: {
+								data: this.x
+							},
+							yAxis: {},
+							series: [{
+								name: '涨跌动能',
+								type: 'bar',
+								data: this.y
+							}]
+						};
+
+
+						chart1.setOption(option1);
+						chart2.setOption(option2);
+
+					},
+					selectChange() {
+						console.log(this.code);
+						this.request();
+					}
+				},
+				created() {
+					this.code = this.jjList[0].code;
+				},
+				mounted() {
+					this.request();
+				}
+			})
+		</script>
+
+		<script type="text/javascript">
+			// 基于准备好的dom，初始化echarts实例
+			// var myChart = echarts.init(document.getElementById('main'));
+
+			// 指定图表的配置项和数据
+			// var option = {
+			//     title: {
+			//         text: 'ECharts 入门示例'
+			//     },
+			//     tooltip: {},
+			//     legend: {
+			//         data:['动能']
+			//     },
+			//     xAxis: {
+			//         data: ["01-04","01-05","01-06","01-07","01-08","01-11","01-12","01-13","01-14","01-15","01-18"]
+			//     },
+			//     yAxis: {},
+			//     series: [{
+			//         name: '动能',
+			//         type: 'line',
+			//         data: [-1.29, -1.11, 1.83, 1.5, -0.2, -0.59, 3.57, -1.24, -0.48, 2.43, 0.29]
+			//     }]
+			// };
+
+			// var option = {
+			// 	title: {
+			// 		text: '测试'
+			// 	},
+			// 	tooltip: {},
+			// 	legend: {
+			// 		data: ['动能']
+			// 	},
+			// 	xAxis: {
+			// 		data: ["12-01", "12-02", "12-03", "12-04", "12-07", "12-08", "12-09", "12-10", "12-11", "12-14", "12-15", "12-16",
+			// 			"12-17", "12-18", "12-21", "12-22", "12-23", "12-24", "12-25", "12-28", "12-29", "12-30", "12-31", "01-04",
+			// 			"01-05", "01-06", "01-07", "01-08", "01-11", "01-12", "01-13", "01-14", "01-15", "01-18"
+			// 		]
+			// 	},
+			// 	yAxis: {},
+			// 	series: [{
+			// 		name: '动能',
+			// 		type: 'bar',
+			// 		data: [2.78, -0.37, -0.47, -0.47, -1.70, -0.87, -0.58, -0.49, -1.67, 1.20, -1.05, 0.8, -1.39, -1.47, 0, -3.09,
+			// 			0.62, -0.20, -0.72, 1.03, 0.31, 0, 2.65, -1.29, -1.11, 1.83, 1.5, -0.2, -0.59, 3.57, -1.24, -0.48, 2.43, 0.29
+			// 		]
+			// 	}]
+			// };
+
+
+			// 使用刚指定的配置项和数据显示图表。
+			// myChart.setOption(option);
+		</script>
+
+
+
+
+
+	</body>
+</html>

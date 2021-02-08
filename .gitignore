@@ -1,1 +1,6 @@
 venv
+.idea
+build
+dist
+*.spec
+*.pyc
