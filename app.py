@@ -2,9 +2,12 @@ from flask import Flask, redirect
 from flask import request
 import json
 from flask_cors import cross_origin
+from flask_cors import CORS
 import requests
 
+
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 
 
 @app.route('/')
